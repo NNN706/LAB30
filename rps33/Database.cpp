@@ -7,12 +7,9 @@
 #include <vector>
 #include <ctime>
 #include <string>
-
 #pragma comment(lib, "odbc32.lib")
 
 using namespace std;
-
-// ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =================
 
 wstring utf8_to_wstring(const string& str) {
     if (str.empty()) return L"";
@@ -36,7 +33,6 @@ string wstring_to_utf8(const wstring& wstr) {
     return str;
 }
 
-// ================= РЕАЛИЗАЦИЯ КЛАССА DATABASE =================
 
 Database::Database() : henv(SQL_NULL_HENV), hdbc(SQL_NULL_HDBC), connected(false) {
 }
@@ -48,14 +44,14 @@ Database::~Database() {
 bool Database::open() {
     SQLRETURN retcode;
 
-    // 1. Allocate environment handle
+    // 1. Рукопожатие с ODBC
     retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
     if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
         cerr << "Ошибка выделения окружения ODBC" << endl;
         return false;
     }
 
-    // 2. Set the ODBC version
+    // 2. установки корректной ODBC
     retcode = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
     if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
         cerr << "Ошибка установки версии ODBC" << endl;
@@ -63,7 +59,7 @@ bool Database::open() {
         return false;
     }
 
-    // 3. Allocate connection handle
+    // 3. проверка подключения
     retcode = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
     if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
         cerr << "Ошибка выделения соединения ODBC" << endl;
@@ -71,7 +67,7 @@ bool Database::open() {
         return false;
     }
 
-    // 4. Connect to SQL Server
+    // 4. подключение
     SQLWCHAR* dsn = (SQLWCHAR*)L"Driver={ODBC Driver 17 for SQL Server};"
         L"Server=localhost;"
         L"Database=SortingDB;"
@@ -370,7 +366,6 @@ std::vector<std::string> Database::getUserArrays(const std::string& username) {
     return result;
 }
 
-// Остальные функции (заглушки)
 bool Database::testConnection() {
     return connected;
 }
@@ -380,7 +375,6 @@ std::vector<SortingRecord> Database::getUserHistory(const std::string& username)
 }
 
 void Database::checkTableStructure() {
-    // Пустая реализация
 }
 
 int Database::getUserIDFromUsername(const std::string& username) {
